@@ -1,0 +1,92 @@
+spring:
+  profiles:
+    active: dev
+
+logging:
+  name: ucenter
+  level: debug
+  path: /tmp/logs/
+
+---
+#dev 环境
+spring:
+  profiles: dev
+  datasource:
+      url: jdbc:postgresql://192.168.1.2:5432/ms
+      username: ms
+      password: spiderdt
+      driver-class-name: org.postgresql.Driver
+redis:
+  host: 192.168.1.2
+  port: 6379
+  database: 0
+  timeout: 3000
+  prefix: url
+
+shorturl:
+  incrkey: surl_index
+  http_prefix: 127.0.0.1:8905/s/
+
+server:
+  tomcat:
+    max-threads: 100
+    min-spare-threads: 20
+  port: 8906
+  connection-timeout: 5000
+---
+#test 环境
+spring:
+  profiles: test
+server:
+  tomcat:
+    max-threads: 100
+    min-spare-threads: 20
+  port: 8900
+  connection-timeout: 5000
+spiderdt:
+  rate: test
+
+---
+#prod 环境
+spring:
+  profiles: prod
+  datasource:
+    url: jdbc:postgresql://192.168.1.2:5432/ms
+    username: ms
+    password: spiderdt
+    driver-class-name: org.postgresql.Driver
+
+redis:
+  host: 192.168.1.2
+  port: 6379
+  database: 0
+  timeout: 3000
+  prefix: url
+
+shorturl:
+  incrkey: surl_index
+  http_prefix: spiderdt.cn/
+logging:
+  level: info
+  path: /data/tomcat/logs/
+server:
+  tomcat:
+    max-threads: 100
+    min-spare-threads: 20
+  port: 8906
+  connection-timeout: 5000
+---
+#pub config
+mybatis:
+  mapper-locations: classpath:mapper/*Dao.xml
+  config-location: classpath:mybatis/mybatis-config.xml
+  executor-type: simple
+  type-aliases-package: com.spiderdt.common.entity
+
+#系统自带默认的tomcat,也可以使用jetty。需要配置jetty依赖。
+management:
+  security:
+    enabled: false
+
+spiderdt:
+  task-thread-nums: 32

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.spiderdt.common.dao.UrlsDao">
+    <resultMap id="urlsResultMap" type="com.spiderdt.common.entity.UrlsEntity"></resultMap>
+    <select id="getUrlInfoByCode" resultMap="urlsResultMap" parameterType="String">
+        select * from shorturl.urls where code= #{code};
+    </select>
+    <insert id="createUrlsInfoBatch"  parameterType="List" useGeneratedKeys="false">
+        insert into shorturl.urls
+        (code,org_url,create_time,update_time,status) values
+        <foreach collection="items" item="url" index="index" separator=",">
+            (#{url.code},#{url.orgUrl},
+            to_char(now(), 'YYYY-MM-DD HH24:MI:SS' :: TEXT),
+            to_char(now(), 'YYYY-MM-DD HH24:MI:SS' :: TEXT),
+            <choose>
+                <when test="url.status != null">
+                    #{url.status}
+                </when>
+                <otherwise>
+                    'OK'::TEXT
+                </otherwise>
+            </choose>
+            )
+        </foreach>
+    </insert>
+    <update id="updateUrlStatus" >
+        update shorturl.urls
+        set update_time =  to_char(now(), 'YYYY-MM-DD HH24:MI:SS' :: TEXT),
+        status = #{status}
+        where code = #{code};
+    </update>
+</mapper>
